@@ -6,10 +6,10 @@ import com.google.inject.Inject;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import titov.prof.extentions.UIExtention;
+import titov.prof.extentions.UIExtension;
 import titov.prof.pages.CoursePage;
 
-@ExtendWith(UIExtention.class)
+@ExtendWith(UIExtension.class)
 public class FindCourseTest {
   @Inject
   private CoursePage coursePage;

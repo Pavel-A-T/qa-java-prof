@@ -4,14 +4,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.google.inject.Inject;
 import org.junit.jupiter.api.extension.ExtendWith;
-import titov.prof.extentions.UIExtention;
+import titov.prof.extentions.UIExtension;
 import titov.prof.utils.Course;
 import titov.prof.utils.ReduceCourses;
 import org.junit.jupiter.api.Test;
 import titov.prof.pages.CoursePage;
 import java.util.List;
 
-@ExtendWith(UIExtention.class)
+@ExtendWith(UIExtension.class)
 public class EarlerCoursesTest {
   @Inject
   private CoursePage coursePage;

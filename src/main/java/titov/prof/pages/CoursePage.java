@@ -12,13 +12,13 @@ import java.util.*;
 
 @Path("/catalog/courses")
 public class CoursePage extends AbsBasePage<CoursePage> {
-  List<Course> allCourses = new ArrayList<>();
+  private List<Course> allCourses = new ArrayList<>();
   @FindBy(xpath = "//input[@type=\"search\"]")
   private WebElement search;
-  By linkWithClass = By.className("sc-zzdkm7-0");
-  By pathButtonSeeMore = By.xpath("//button[contains(text(),\"Показать еще\")]");
-  By courseDate = By.xpath("./div/div/div[contains(@class,\"jEGzDf\") and not(*)]");
-  By courseNamePath = By.xpath("./h6/div");
+  private By linkWithClass = By.className("sc-zzdkm7-0");
+  private By pathButtonSeeMore = By.xpath("//button[contains(text(),\"Показать еще\")]");
+  private By courseDate = By.xpath("./div/div/div[contains(@class,\"jEGzDf\") and not(*)]");
+  private By courseNamePath = By.xpath("./h6/div");
 
   public CoursePage(WebDriver webDriver) {
     super(webDriver);
@@ -49,35 +49,45 @@ public class CoursePage extends AbsBasePage<CoursePage> {
         })
         .findFirst();
     if (optional.isPresent()) {
-      optional.get().click();
+      WebElement element = optional.get();
+      try {
+        element.click();
+      }
+      catch (Exception e) {
+        goBlockCentre(element);
+        element.click();
+      }
       return page(LessonPage.class);
     }
     throw new RuntimeException(courseName + " не найден!");
   }
 
   public CoursePage getAllCourses() {
+    int i = 0;
     Map<String, String> courses = new HashMap<>();
     List<WebElement> moreList;
     do {
+      i++;
       List<WebElement> elements = driver.findElements(linkWithClass);
       elements
           .stream()
-          .filter(o -> {
+          .filter(Objects::nonNull)
+          .forEach(o -> {
             try {
               String value = o.findElement(courseDate).getText();
               String key = o.findElement(courseNamePath).getText();
               courses.put(key, value);
-              return true;
-            } catch (Exception ignored) {
-              return false;
+            } catch (Exception exp) {
+              Throwable ignored = exp;
             }
           });
+      waiter.waitForElementVisibleByLocator(pathButtonSeeMore);
       moreList = driver.findElements(pathButtonSeeMore);
       if (moreList.size() == 1) {
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center', inline: 'center'});", moreList.get(0));
+        goBlockCentre(moreList.get(0));
         moreList.get(0).click();
       }
-    } while(moreList.size() > 0);
+    } while(i < 10 && moreList.size() > 0);
     for (String key : courses.keySet()) {
       allCourses.add(getCourse(Course.class, key, courses.get(key)));
     }
@@ -85,30 +95,27 @@ public class CoursePage extends AbsBasePage<CoursePage> {
   }
 
   public Course findCourseWithJSOUP(String courseName) {
+    String currentCourseName = "//a/h6/div[contains(text(),\"" + "%s" + "\")]";
     String className = "sc-zzdkm7-0";
     String h6CSSQuery = "h6 > div";
     String cssQuery = "h6 + div > div > div";
-    List<WebElement> moreList;
+    findCourse(courseName);
+    By xpath = By.xpath(String.format(currentCourseName, courseName));
+    waiter.waitForElementVisibleByLocator(xpath);
     try {
-      do {
-        moreList = driver.findElements(pathButtonSeeMore);
-        if (moreList.size() == 1) {
-          moreList.get(0).click();
+      String pageSource = driver.getPageSource();
+      Document doc = Jsoup.parse(pageSource);
+      Elements links = doc.getElementsByClass(className);
+      for (Element element : links) {
+        String jsoupCourse = element.select(h6CSSQuery).text();
+        if (courseName.equals(jsoupCourse)) {
+          String date = element.select(cssQuery).text();
+          return getCourse(Course.class, jsoupCourse, date);
         }
-        String pageSource = driver.getPageSource();
-        Document doc = Jsoup.parse(pageSource);
-        Elements links = doc.getElementsByClass(className);
-        for (Element element : links) {
-          String jsoupCourse = element.select(h6CSSQuery).text();
-          if (courseName.equals(jsoupCourse)) {
-            String date = element.select(cssQuery).text();
-            return getCourse(Course.class, jsoupCourse, date);
-          }
-        }
-      } while (moreList.size() > 0);
+      }
     } catch (Exception e) {
       System.out.println("Ошибка в JSOUP: " + e.getMessage());
     }
-    return null;
+    return getCourse(Course.class, "", "");
   }
 }

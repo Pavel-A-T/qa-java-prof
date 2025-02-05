@@ -5,9 +5,9 @@ import static titov.prof.utils.DateComparison.parseDate;
 import java.time.LocalDate;
 
 public class Course {
-  String nameCourse;
-  String startDate;
-  LocalDate date;
+  private String nameCourse;
+  private String startDate;
+  private LocalDate date;
 
   public LocalDate getLocalDate() {
     return date;

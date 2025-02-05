@@ -8,7 +8,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.openqa.selenium.WebDriver;
 import titov.prof.guice.GuiceModule;
 
-public class UIExtention implements BeforeEachCallback, AfterEachCallback {
+public class UIExtension implements BeforeEachCallback, AfterEachCallback {
   private Injector injector;
 
   @Override
