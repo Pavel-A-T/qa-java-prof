@@ -16,7 +16,7 @@
     <junit-jupiter-params.version>5.10.0</junit-jupiter-params.version>
     <io.github.bonigarcia.version>LATEST</io.github.bonigarcia.version>
     <org.jsoup.version>1.18.2</org.jsoup.version>
-    <org.seleniumhq.selenium.version>4.27.0</org.seleniumhq.selenium.version>
+    <org.seleniumhq.selenium.version>4.31.0</org.seleniumhq.selenium.version>
     <assertj.version>3.27.2</assertj.version>
     <guice.version>7.0.0</guice.version>
 
@@ -28,6 +28,7 @@
 
     <base.url>https://otus.ru</base.url>
     <browser.name>chrome</browser.name>
+    <browser.version>128.0</browser.version>
     <webdriver.waiter.timeout>15</webdriver.waiter.timeout>
     <webdriver.waiter.duration>3</webdriver.waiter.duration>
   </properties>
@@ -133,6 +134,7 @@
           <systemPropertyVariables>
             <base.url>${base.url}</base.url>
             <browser.name>${browser.name}</browser.name>
+            <browser.version>${browser.version}</browser.version>
             <webdriver.waiter.timeout>${webdriver.waiter.timeout}</webdriver.waiter.timeout>
             <webdriver.waiter.duration>${webdriver.waiter.duration}</webdriver.waiter.duration>
           </systemPropertyVariables>

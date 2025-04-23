@@ -1,0 +1,77 @@
+version: '3.7'
+
+services:
+  selenoid1:
+    image: aerokube/selenoid:latest-release
+    # ports:
+    #  - 4444:4444
+    hostname: selenoid1
+    networks:
+      - selenoid1    
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/pol/.selenoid/browsers.json:/etc/selenoid/browsers.json:ro
+    command: ["-container-network=selenoid1"]
+
+  selenoid2:
+    image: aerokube/selenoid:latest-release
+    # ports:
+    #  - 4445:4444
+    hostname: selenoid2
+    networks:
+      - selenoid2
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/pol/.selenoid/browsers.json:/etc/selenoid/browsers.json:ro
+    command: ["-container-network=selenoid2"]
+
+  ggr:
+    image: aerokube/ggr:latest
+    hostname: ggr
+    ports:
+      - 4444:4444  
+    depends_on: ["selenoid1", "selenoid2"]
+    networks: 
+      - selenoid1
+      - selenoid2  
+    volumes:
+      - /home/pol/ggr/:/etc/grid-router:ro
+    command: ["guests-allowed", "guest-quota", "pavel", "-verbose"]
+
+  ggr_ui:
+    image: aerokube/ggr-ui:latest
+    hostname: ggr_ui
+    depends_on: ["ggr"]
+    networks:
+      - selenoid1
+      - selenoid2  
+    ports:
+      - 8888:8888    
+    volumes:
+      - /home/pol/ggr/quota/:/etc/grid-router/quota:ro
+
+  selenoid_ui:
+    image: aerokube/selenoid-ui:latest
+    hostname: selenoid_ui
+    depends_on: ["ggr_ui"]
+    networks:
+      - selenoid1  
+    ports:
+      - 8080:8080     
+    command: ["--selenoid-uri", "http://ggr_ui:8888"]
+
+  nginx:
+    image: nginx
+    depends_on: ["selenoid_ui"]
+    networks:
+      - selenoid1  
+    volumes:
+      - /home/pol/nginx/selenoid.conf:/etc/nginx/conf.d/selenoid.conf:ro
+    ports:
+      - 80:80    
+
+networks:
+  selenoid1:
+    name: selenoid1 
+  selenoid2:
+    name: selenoid2  
