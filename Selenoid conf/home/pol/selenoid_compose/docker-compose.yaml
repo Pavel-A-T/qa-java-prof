@@ -28,8 +28,8 @@ services:
   ggr:
     image: aerokube/ggr:latest
     hostname: ggr
-    ports:
-      - 4444:4444  
+    # ports:
+    #  - 4444:4444
     depends_on: ["selenoid1", "selenoid2"]
     networks: 
       - selenoid1
@@ -45,8 +45,8 @@ services:
     networks:
       - selenoid1
       - selenoid2  
-    ports:
-      - 8888:8888    
+    # ports:
+    #  - 8888:8888
     volumes:
       - /home/pol/ggr/quota/:/etc/grid-router/quota:ro
 
@@ -56,8 +56,8 @@ services:
     depends_on: ["ggr_ui"]
     networks:
       - selenoid1  
-    ports:
-      - 8080:8080     
+    # ports:
+    #  - 8080:8080
     command: ["--selenoid-uri", "http://ggr_ui:8888"]
 
   nginx:
